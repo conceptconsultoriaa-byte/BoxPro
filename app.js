@@ -121,13 +121,15 @@ document.querySelectorAll(".tab-btn[data-tab]").forEach(btn=>{
 
 /* ---------------- MARCA / TEMA ---------------- */
 function applyBrand(){
+  const claro = OFICINA.fundo_estilo === "carbono" && planoAtual().fundoCarbono;
+  document.documentElement.setAttribute("data-theme", claro ? "light" : "dark");
   document.documentElement.style.setProperty("--lime", OFICINA.brand_color || "#C6E619");
   document.documentElement.style.setProperty("--lime-ink", contrastInk(OFICINA.brand_color || "#C6E619"));
   document.getElementById("brandName").textContent = OFICINA.name || "BoxPro";
   const logoEl = document.getElementById("brandLogo");
   if(OFICINA.logo_url){ logoEl.src = OFICINA.logo_url; logoEl.classList.remove("hidden"); }
   else { logoEl.classList.add("hidden"); }
-  document.body.classList.toggle("fundo-carbono", OFICINA.fundo_estilo === "carbono" && planoAtual().fundoCarbono);
+  document.body.classList.toggle("fundo-carbono", claro);
 }
 function contrastInk(hex){
   const num = parseInt(hex.slice(1),16);
