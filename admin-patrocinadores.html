@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoxPro — Admin de Patrocinadores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="content" style="max-width:760px;">
+    <h1>Admin — Patrocinadores do BoxPro</h1>
+    <p class="hint">Essa tela é restrita a você. O patrocinador marcado como "ativo" aparece no Painel de todas as oficinas assinantes.</p>
+
+    <div id="accessDenied" class="hidden">
+      <p class="hint">Acesso restrito. Entre com a conta autorizada.</p>
+    </div>
+
+    <div id="adminArea" class="hidden">
+      <h2>Novo patrocinador</h2>
+      <form id="novoPatrocinadorForm" class="form-grid">
+        <label>Nome da marca <input type="text" id="pNome" required></label>
+        <label>Logotipo <input type="file" id="pLogo" accept="image/*" required></label>
+        <label>Link de destino (site/WhatsApp do patrocinador) <input type="url" id="pLink" placeholder="https://..."></label>
+        <label style="flex-direction:row; align-items:center; gap:8px;"><input type="checkbox" id="pAtivo" style="min-height:auto;width:18px;"> Deixar ativo imediatamente</label>
+        <button type="submit" class="btn-primary">Cadastrar patrocinador</button>
+      </form>
+
+      <h2>Patrocinadores cadastrados</h2>
+      <div id="listaPatrocinadores"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="lib/supabaseClient.js"></script>
+  <script src="admin-patrocinadores.js"></script>
+</body>
+</html>

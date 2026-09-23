@@ -205,3 +205,25 @@ create table if not exists mp_accounts (
 );
 alter table mp_accounts enable row level security;
 -- De propósito, nenhuma policy é criada aqui: só o backend (chave de serviço) acessa essa tabela.
+
+-- ---------- MIGRAÇÃO: admin de patrocinadores (só o dono da plataforma gerencia) ----------
+create policy "admin gerencia patrocinadores" on patrocinadores
+  for all
+  using (auth.jwt() ->> 'email' = 'tadeuconcept@gmail.com')
+  with check (auth.jwt() ->> 'email' = 'tadeuconcept@gmail.com');
+
+create policy "admin envia logo de patrocinador" on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id = 'logos'
+    and (storage.foldername(name))[1] = 'patrocinadores'
+    and auth.jwt() ->> 'email' = 'tadeuconcept@gmail.com'
+  );
+
+create policy "admin atualiza logo de patrocinador" on storage.objects
+  for update to authenticated
+  using (
+    bucket_id = 'logos'
+    and (storage.foldername(name))[1] = 'patrocinadores'
+    and auth.jwt() ->> 'email' = 'tadeuconcept@gmail.com'
+  );

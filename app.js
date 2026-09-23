@@ -459,6 +459,62 @@ function renderDashboard(){
   });
 }
 
+/* ---------------- RELATORIOS ---------------- */
+document.getElementById("filtroStatus").addEventListener("change", renderRelatorioOficina);
+document.getElementById("filtroPeriodo").addEventListener("change", renderRelatorioOficina);
+
+function dateKeyHoje(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function dentroDoPeriodo(dateStr, periodo){
+  if(periodo === "tudo") return true;
+  const hoje = new Date();
+  const d = new Date(dateStr + "T00:00:00");
+  if(periodo === "dia") return dateStr === dateKeyHoje();
+  if(periodo === "semana"){
+    const inicioSemana = new Date(hoje); inicioSemana.setHours(0,0,0,0); inicioSemana.setDate(hoje.getDate() - hoje.getDay());
+    const fimSemana = new Date(inicioSemana); fimSemana.setDate(inicioSemana.getDate() + 6); fimSemana.setHours(23,59,59,999);
+    return d >= inicioSemana && d <= fimSemana;
+  }
+  if(periodo === "mes") return d.getFullYear() === hoje.getFullYear() && d.getMonth() === hoje.getMonth();
+  return true;
+}
+
+function renderRelatorioOficina(){
+  const liberado = planoAtual().relatorioCompleto;
+  document.getElementById("relatorioLocked").classList.toggle("hidden", liberado);
+  document.getElementById("relatorioContent").classList.toggle("hidden", !liberado);
+  if(!liberado) return;
+  const filtro = document.getElementById("filtroStatus").value;
+  const periodo = document.getElementById("filtroPeriodo").value;
+  const body = document.getElementById("reportBody");
+  body.innerHTML = "";
+
+  const noPeriodo = ORDENS.filter(o=> dentroDoPeriodo(o.data, periodo));
+  const list = noPeriodo.filter(o=>{
+    if(filtro === "aberto") return !o.pago && o.status !== "cancelado";
+    if(filtro === "pago") return o.pago;
+    if(filtro === "cancelado") return o.status === "cancelado";
+    return true;
+  }).sort((a,b)=> (b.data+(b.horario||"")).localeCompare(a.data+(a.horario||"")));
+
+  if(list.length === 0){ body.innerHTML = `<tr><td colspan="5" class="hint">Nenhuma OS nesse período.</td></tr>`; }
+  list.forEach(o=>{
+    const valor = o.valor_final || o.valor_orcamento;
+    const statusLabel = o.status === "cancelado" ? "Cancelado" : (o.pago ? "Recebido" : "A receber");
+    const statusClass = o.status === "cancelado" ? "status-cancelado" : (o.pago ? "status-pago" : "status-pendente");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${formatDateBR(o.data)}</td><td>${o.cliente_nome}</td><td>${o.veiculo_modelo || o.veiculo_tipo}${o.veiculo_placa ? " ("+o.veiculo_placa+")" : ""}</td><td>${valor ? brl(valor) : "—"}</td><td><span class="status-badge ${statusClass}">${statusLabel}</span></td>`;
+    body.appendChild(tr);
+  });
+
+  const totalPendente = noPeriodo.filter(o=>!o.pago && o.status !== "cancelado").reduce((s,o)=>s+Number(o.valor_orcamento||0),0);
+  const totalPago = noPeriodo.filter(o=>o.pago).reduce((s,o)=>s+Number(o.valor_final||o.valor_orcamento||0),0);
+  document.getElementById("repTotalPendente").textContent = brl(totalPendente);
+  document.getElementById("repTotalPago").textContent = brl(totalPago);
+}
+
 /* ---------------- REFRESH ALL ---------------- */
 function refreshAll(){
   renderMpStatus();
@@ -467,6 +523,7 @@ function refreshAll(){
   fillOsSelects();
   renderKanban();
   renderDashboard();
+  renderRelatorioOficina();
 }
 
 /* ---------------- INIT ---------------- */
