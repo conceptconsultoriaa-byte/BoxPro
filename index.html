@@ -20,7 +20,7 @@
     <nav class="tabs">
       <button class="tab-btn active" data-tab="painel">Painel</button>
       <button class="tab-btn" data-tab="nova">Nova OS</button>
-      <button class="tab-btn" data-tab="ordens">Ordens</button>
+      <button class="tab-btn" data-tab="ordens">Ordens <span id="badgeOrdens" class="tab-badge hidden">0</span></button>
       <button class="tab-btn" data-tab="mecanicos">Mecânicos</button>
       <button class="tab-btn" data-tab="config">Configurações</button>
       <button class="tab-btn" id="logoutBtn">Sair</button>
@@ -114,7 +114,7 @@
         <label>Estilo de fundo
           <select id="cfgFundo">
             <option value="escuro">Escuro (padrão)</option>
-            <option value="carbono">Carbono</option>
+            <option value="carbono">Claro</option>
           </select>
         </label>
         <label>Logotipo <input type="file" id="cfgLogo" accept="image/*"><span class="hint" id="cfgLogoHint"></span></label>
@@ -135,7 +135,7 @@
         </div>
         <div class="card">
           <span class="card-label">Pro — R$ 179/mês</span>
-          <span class="hint">Até 8 mecânicos, relatório completo, marca e cor personalizada, fundo carbono.</span>
+          <span class="hint">Até 8 mecânicos, relatório completo, marca e cor personalizada, tema claro exclusivo.</span>
           <button class="btn-primary" id="btnAssinarPro" style="margin-top:10px;">Assinar Pro</button>
         </div>
       </div>

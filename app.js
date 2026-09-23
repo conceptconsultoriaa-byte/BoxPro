@@ -189,7 +189,7 @@ cfgForm.addEventListener("submit", async e=>{
     slug: document.getElementById("cfgSlug").value.trim().toLowerCase()
   };
   if(updates.fundo_estilo === "carbono" && !planoAtual().fundoCarbono){
-    alert("Fundo carbono é exclusivo do plano Pro."); return;
+    alert("Esse tema é exclusivo do plano Pro."); return;
   }
   const file = document.getElementById("cfgLogo").files[0];
   if(file && !planoAtual().logoPersonalizado){
@@ -420,6 +420,10 @@ function renderDashboard(){
   document.getElementById("statProntas").textContent = prontas.length;
   document.getElementById("statAReceber").textContent = brl(aReceber);
   document.getElementById("statRecebido").textContent = brl(recebido);
+
+  const badge = document.getElementById("badgeOrdens");
+  badge.textContent = abertas.length;
+  badge.classList.toggle("hidden", abertas.length === 0);
 
   const el = document.getElementById("proximasList");
   el.innerHTML = "";

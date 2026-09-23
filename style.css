@@ -47,24 +47,15 @@ body{
 a{color:inherit;}
 :focus-visible{outline:2px solid var(--lime); outline-offset:2px;}
 
-/* ---------- FUNDO CARBONO (opcional, escolhido pelo assinante) ---------- */
+/* ---------- TEMA CLARO (opcional, escolhido pelo assinante) ---------- */
 body.fundo-carbono{
-  background:
-    linear-gradient(27deg, #1e1e1e 5px, transparent 5px) 0 5px,
-    linear-gradient(207deg, #1e1e1e 5px, transparent 5px) 10px 0,
-    linear-gradient(27deg, #2e2e2e 5px, transparent 5px) 0 10px,
-    linear-gradient(207deg, #2e2e2e 5px, transparent 5px) 10px 5px,
-    linear-gradient(90deg, #0d0d0d 10px, transparent 10px),
-    linear-gradient(#333333 25%, #191919 25%, #191919 50%, #333333 50%, #333333 75%, #191919 75%, #191919 100%);
-  background-color:#141414;
-  background-repeat:repeat;
-  background-size:20px 20px;
+  background-color:#EDEDE6;
+  color:#101010;
 }
 body.fundo-carbono .card, body.fundo-carbono .form-grid, body.fundo-carbono .kanban-col, body.fundo-carbono .list-item, body.fundo-carbono .report-table{
-  background:rgba(23,23,23,0.9); border-color:#2E2E2E;
+  background:#FFFFFF; border-color:#DCDCD2;
 }
-body.fundo-carbono{color:#F5F5EF;}
-body.fundo-carbono .card-label, body.fundo-carbono .hint{color:#9A9A8E;}
+body.fundo-carbono .card-label, body.fundo-carbono .hint{color:#6B6B62;}
 
 /* ---------- TOPBAR ---------- */
 .topbar{
@@ -100,6 +91,12 @@ body.fundo-carbono .card-label, body.fundo-carbono .hint{color:#9A9A8E;}
 }
 .tab-btn:hover{border-color:var(--lime); color:var(--ink-invert);}
 .tab-btn.active{background:var(--lime); color:var(--lime-ink); border-color:var(--lime);}
+.tab-badge{
+  display:inline-block; min-width:18px; padding:1px 6px; margin-left:4px;
+  border-radius:999px; background:var(--danger); color:#fff;
+  font-size:0.68rem; font-weight:800; line-height:1.4;
+}
+.tab-btn.active .tab-badge{background:var(--lime-ink); color:var(--lime);}
 #logoutBtn{border-color:rgba(192,57,43,0.5); color:#E8998C;}
 #logoutBtn:hover{border-color:var(--danger); color:#fff;}
 
