@@ -112,3 +112,30 @@ create policy "public can create ordem" on ordens_servico
 
 create policy "public can read patrocinadores ativos" on patrocinadores
   for select using (ativo = true);
+
+-- ---------- STORAGE (logo do assinante) ----------
+-- Crie um bucket público chamado "logos" (Storage → New bucket → Public bucket = ON), se ainda não existir.
+-- Sem as políticas abaixo, o upload falha com "new row violates row-level security policy".
+
+create policy "dono envia logo da propria oficina" on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id = 'logos'
+    and exists (select 1 from oficinas o where o.owner_id = auth.uid() and o.id::text = (storage.foldername(name))[1])
+  );
+
+create policy "dono atualiza logo da propria oficina" on storage.objects
+  for update to authenticated
+  using (
+    bucket_id = 'logos'
+    and exists (select 1 from oficinas o where o.owner_id = auth.uid() and o.id::text = (storage.foldername(name))[1])
+  );
+
+create policy "qualquer um pode ver os logos" on storage.objects
+  for select using (bucket_id = 'logos');
+
+-- ---------- MIGRAÇÃO: prazo do teste grátis (30 dias) ----------
+alter table oficinas add column if not exists trial_expires_at timestamptz;
+update oficinas set trial_expires_at = coalesce(trial_expires_at, created_at + interval '30 days');
+alter table oficinas alter column trial_expires_at set default (now() + interval '30 days');
+alter table oficinas alter column trial_expires_at set not null;
