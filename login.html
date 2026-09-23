@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoxPro — Entrar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+  <div class="auth-card">
+    <h1>BoxPro</h1>
+    <p class="hint">Entre ou crie a conta da sua oficina. Cada conta tem suas próprias ordens de serviço, mecânicos e marca — isolados das demais oficinas.</p>
+
+    <form id="loginForm" class="auth-form">
+      <label>E-mail <input type="email" id="loginEmail" required></label>
+      <label>Senha <input type="password" id="loginSenha" required minlength="6"></label>
+      <button type="submit" class="btn-primary">Entrar</button>
+    </form>
+
+    <hr>
+
+    <form id="signupForm" class="auth-form">
+      <h2>Criar conta nova</h2>
+      <label>E-mail <input type="email" id="signupEmail" required></label>
+      <label>Senha (mín. 6 caracteres) <input type="password" id="signupSenha" required minlength="6"></label>
+      <button type="submit" class="btn-secondary">Criar conta</button>
+    </form>
+
+    <p id="authMsg" class="hint"></p>
+    <p class="hint">Ao criar conta, você concorda com os <a href="termos.html" style="color:var(--lime);font-weight:700;">Termos de Uso e Privacidade</a>.</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="lib/supabaseClient.js"></script>
+  <script src="login.js"></script>
+</body>
+</html>

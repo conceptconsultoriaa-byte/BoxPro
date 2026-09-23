@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoxPro — Painel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <img id="brandLogo" src="" alt="" class="brand-logo hidden">
+      <span id="brandName" class="brand-name">BoxPro</span>
+    </div>
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="painel">Painel</button>
+      <button class="tab-btn" data-tab="nova">Nova OS</button>
+      <button class="tab-btn" data-tab="ordens">Ordens</button>
+      <button class="tab-btn" data-tab="mecanicos">Mecânicos</button>
+      <button class="tab-btn" data-tab="config">Configurações</button>
+      <button class="tab-btn" id="logoutBtn">Sair</button>
+    </nav>
+  </header>
+
+  <main class="content">
+
+    <section id="tab-painel" class="tab-panel active">
+      <div id="sponsorBanner"></div>
+      <h1>Visão geral</h1>
+      <div class="cards">
+        <div class="card"><span class="card-label">OS em aberto</span><span class="card-value" id="statAbertas">0</span></div>
+        <div class="card"><span class="card-label">Prontas p/ retirada</span><span class="card-value" id="statProntas">0</span></div>
+        <div class="card"><span class="card-label">A receber</span><span class="card-value" id="statAReceber">R$ 0,00</span></div>
+        <div class="card"><span class="card-label">Recebido</span><span class="card-value" id="statRecebido">R$ 0,00</span></div>
+      </div>
+      <h2>Últimas ordens de serviço</h2>
+      <div id="proximasList" class="appointment-list"></div>
+    </section>
+
+    <section id="tab-nova" class="tab-panel">
+      <h1>Nova ordem de serviço</h1>
+      <form id="osForm" class="form-grid">
+        <label>Nome do cliente <input type="text" id="osCliente" required></label>
+        <label>WhatsApp do cliente <input type="tel" id="osTelefone" required placeholder="55 11 99999-9999"></label>
+        <label>Tipo de veículo
+          <select id="osVeiculoTipo">
+            <option value="carro">Carro</option>
+            <option value="moto">Moto</option>
+          </select>
+        </label>
+        <label>Placa <input type="text" id="osPlaca" placeholder="ABC1D23"></label>
+        <label>Modelo <input type="text" id="osModelo" placeholder="Ex: Honda CG 160"></label>
+        <label>Ano <input type="text" id="osAno" placeholder="2020"></label>
+        <label>KM atual <input type="text" id="osKm" placeholder="45000"></label>
+        <label>Mecânico responsável
+          <select id="osMecanico"></select>
+        </label>
+        <label>Serviço
+          <select id="osServico"></select>
+        </label>
+        <label>Data prevista de entrega <input type="date" id="osData" required></label>
+        <label>Horário previsto <input type="time" id="osHorario" required value="17:00"></label>
+        <label style="grid-column:1/-1;">Check-in de entrada (avarias, nível de combustível, itens no veículo, observações)
+          <textarea id="osCheckin" placeholder="Ex: Arranhão na lateral direita, tanque 1/2, sem itens de valor no interior."></textarea>
+        </label>
+        <button type="submit" class="btn-primary">Abrir ordem de serviço</button>
+      </form>
+      <div id="osResult"></div>
+    </section>
+
+    <section id="tab-ordens" class="tab-panel">
+      <h1>Ordens de serviço</h1>
+      <p class="hint">Clique em uma OS pra avançar o status ou gerar o link de pagamento do orçamento.</p>
+      <div class="kanban-wrap">
+        <div class="kanban" id="kanbanBoard"></div>
+      </div>
+    </section>
+
+    <section id="tab-mecanicos" class="tab-panel">
+      <h1>Mecânicos</h1>
+      <form id="mecForm" class="form-inline">
+        <input type="text" id="mecNome" placeholder="Nome do mecânico" required>
+        <input type="text" id="mecEspecialidade" placeholder="Especialidade (ex: Motor, Elétrica)">
+        <button type="submit" class="btn-primary">Adicionar</button>
+      </form>
+      <h2>Serviços oferecidos</h2>
+      <form id="servForm" class="form-inline">
+        <input type="text" id="servNome" placeholder="Nome do serviço" required>
+        <input type="number" id="servPreco" placeholder="Preço base (R$)" min="0" step="0.01" required>
+        <input type="number" id="servDuracao" placeholder="Duração (min)" min="15" step="15" value="60" required>
+        <button type="submit" class="btn-primary">Adicionar serviço</button>
+      </form>
+      <div id="mecList" class="list"></div>
+      <div id="servList" class="list"></div>
+    </section>
+
+    <section id="tab-config" class="tab-panel">
+      <h1>Configurações da oficina</h1>
+      <form id="configForm" class="form-grid">
+        <label>Nome da oficina <input type="text" id="cfgNome" required></label>
+        <label>Atende
+          <select id="cfgSegmento">
+            <option value="carros">Carros</option>
+            <option value="motos">Motos</option>
+            <option value="ambos">Carros e motos</option>
+          </select>
+        </label>
+        <label>Cor de destaque do app <input type="color" id="cfgCor" value="#C6E619" style="height:44px;padding:4px;"></label>
+        <label>Estilo de fundo
+          <select id="cfgFundo">
+            <option value="escuro">Escuro (padrão)</option>
+            <option value="carbono">Carbono</option>
+          </select>
+        </label>
+        <label>Logotipo <input type="file" id="cfgLogo" accept="image/*"><span class="hint" id="cfgLogoHint"></span></label>
+        <label>WhatsApp da oficina (recebe alerta de nova OS) <input type="tel" id="cfgWhats" placeholder="55 11 99999-9999"></label>
+        <label>Link do seu negócio (slug) <input type="text" id="cfgSlug" required pattern="[a-z0-9-]+" title="letras minúsculas, números e hífen"></label>
+        <button type="submit" class="btn-primary">Salvar</button>
+      </form>
+
+      <h2>Assinatura do BoxPro</h2>
+      <div class="list-item">
+        <span>Status atual: <span class="status-badge" id="subStatusBadge">—</span></span>
+      </div>
+      <div class="cards" style="margin-top:12px;">
+        <div class="card">
+          <span class="card-label">Básico — R$ 99/mês</span>
+          <span class="hint">Até 2 mecânicos, kanban de ordens, check-in, link de pagamento.</span>
+          <button class="btn-primary" id="btnAssinarBasico" style="margin-top:10px;">Assinar Básico</button>
+        </div>
+        <div class="card">
+          <span class="card-label">Pro — R$ 179/mês</span>
+          <span class="hint">Até 8 mecânicos, relatório completo, marca e cor personalizada, fundo carbono.</span>
+          <button class="btn-primary" id="btnAssinarPro" style="margin-top:10px;">Assinar Pro</button>
+        </div>
+      </div>
+      <p class="hint">Depois de pagar, pode levar alguns segundos para o status atualizar aqui.</p>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="lib/supabaseClient.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

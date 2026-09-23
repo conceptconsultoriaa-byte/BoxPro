@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoxPro — Assine agora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="fundo-carbono">
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand"><span class="brand-name">BoxPro</span></div>
+  </header>
+
+  <main class="content" style="max-width:760px;">
+
+    <div id="viewPlanos">
+      <h1 style="font-size:1.9rem;">Sua oficina organizada, do check-in à entrega — com cobrança automática.</h1>
+      <p class="hint" style="font-size:0.95rem;">Ordem de serviço com check-in do veículo, orçamento, acompanhamento de status e link de pagamento — tudo num app só, atende carros, motos ou os dois.</p>
+
+      <div class="cards" style="margin-top:24px;">
+        <div class="card">
+          <span class="card-label">Básico — R$ 99/mês</span>
+          <span class="hint">Até 2 mecânicos, kanban de ordens, check-in de veículo, link de pagamento.</span>
+          <button class="btn-primary" style="margin-top:12px;" onclick="abrirCadastro('basico')">Assinar Básico</button>
+        </div>
+        <div class="card">
+          <span class="card-label">Pro — R$ 179/mês</span>
+          <span class="hint">Até 8 mecânicos, relatório completo, marca e cor personalizada, fundo carbono.</span>
+          <button class="btn-primary" style="margin-top:12px;" onclick="abrirCadastro('pro')">Assinar Pro</button>
+        </div>
+      </div>
+
+      <p class="hint" style="margin-top:20px;">Já é assinante? <a href="login.html" style="color:var(--lime);font-weight:700;">Entrar na minha conta</a></p>
+      <p class="hint">Ao assinar, você concorda com os <a href="termos.html" style="color:var(--lime);font-weight:700;">Termos de Uso e Privacidade</a>.</p>
+    </div>
+
+    <div id="viewCadastro" class="hidden">
+      <h1 style="font-size:1.6rem;">Falta só criar seu acesso</h1>
+      <p class="hint" id="planoEscolhidoTexto"></p>
+      <form id="cadastroForm" class="form-grid" style="margin-top:16px;">
+        <label>Nome da sua oficina <input type="text" id="novaOficinaNome" required placeholder="Ex: Oficina do Zé"></label>
+        <label>Atende
+          <select id="novoSegmento">
+            <option value="carros">Carros</option>
+            <option value="motos">Motos</option>
+            <option value="ambos">Carros e motos</option>
+          </select>
+        </label>
+        <label>Seu e-mail <input type="email" id="novoEmail" required></label>
+        <label>Crie uma senha (mín. 6 caracteres) <input type="password" id="novaSenha" required minlength="6"></label>
+        <button type="submit" class="btn-primary" id="btnConfirmarAssinatura">Confirmar e ir para o pagamento</button>
+      </form>
+      <p class="hint" id="cadastroMsg"></p>
+      <p class="hint"><button class="btn-secondary" onclick="voltarPlanos()">← Voltar</button></p>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="lib/supabaseClient.js"></script>
+<script src="assinar.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+-- =========================================================
+-- BoxPro — schema do banco (rodar inteiro no SQL Editor de um projeto Supabase NOVO)
+-- Multi-tenant: cada "oficina" (assinante) é isolada por RLS.
+-- =========================================================
+
+create extension if not exists "pgcrypto";
+
+-- ---------- TABELAS ----------
+
+create table if not exists oficinas (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  slug text unique not null,
+  name text not null default 'Minha Oficina',
+  segmento text not null default 'ambos' check (segmento in ('carros','motos','ambos')),
+  logo_url text,
+  whatsapp text,
+  brand_color text not null default '#D9FF3F',
+  fundo_estilo text not null default 'escuro' check (fundo_estilo in ('escuro','carbono')),
+  subscription_status text not null default 'trial' check (subscription_status in ('trial','ativo','inadimplente','cancelado')),
+  subscription_plan text,
+  mp_preapproval_id text,
+  created_at timestamptz default now()
+);
+
+create table if not exists mecanicos (
+  id uuid primary key default gen_random_uuid(),
+  oficina_id uuid not null references oficinas(id) on delete cascade,
+  nome text not null,
+  especialidade text,
+  cor text not null default '#D9FF3F',
+  created_at timestamptz default now()
+);
+
+create table if not exists servicos (
+  id uuid primary key default gen_random_uuid(),
+  oficina_id uuid not null references oficinas(id) on delete cascade,
+  nome text not null,
+  preco_base numeric(10,2) not null default 0,
+  duracao_min int not null default 60,
+  created_at timestamptz default now()
+);
+
+create table if not exists ordens_servico (
+  id uuid primary key default gen_random_uuid(),
+  oficina_id uuid not null references oficinas(id) on delete cascade,
+  mecanico_id uuid references mecanicos(id) on delete set null,
+  servico_id uuid references servicos(id) on delete set null,
+  cliente_nome text not null,
+  cliente_telefone text not null,
+  veiculo_tipo text not null default 'carro' check (veiculo_tipo in ('carro','moto')),
+  veiculo_placa text,
+  veiculo_modelo text,
+  veiculo_ano text,
+  veiculo_km text,
+  checkin_detalhes text,
+  data date not null,
+  horario time not null,
+  status text not null default 'recebido' check (status in ('recebido','orcamento','aprovado','em_servico','pronto','entregue','cancelado')),
+  valor_orcamento numeric(10,2),
+  valor_final numeric(10,2),
+  pago boolean not null default false,
+  mp_link text,
+  created_at timestamptz default now()
+);
+
+create table if not exists patrocinadores (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  logo_url text,
+  link_url text,
+  ativo boolean not null default true,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_mecanicos_oficina on mecanicos(oficina_id);
+create index if not exists idx_servicos_oficina on servicos(oficina_id);
+create index if not exists idx_os_oficina on ordens_servico(oficina_id);
+create index if not exists idx_os_status on ordens_servico(oficina_id, status);
+create index if not exists idx_oficina_mp on oficinas(mp_preapproval_id);
+
+-- ---------- ROW LEVEL SECURITY ----------
+
+alter table oficinas enable row level security;
+alter table mecanicos enable row level security;
+alter table servicos enable row level security;
+alter table ordens_servico enable row level security;
+alter table patrocinadores enable row level security;
+
+create policy "owner manages oficina" on oficinas
+  for all using (auth.uid() = owner_id) with check (auth.uid() = owner_id);
+create policy "public can read oficina" on oficinas
+  for select using (true);
+
+create policy "owner manages mecanicos" on mecanicos
+  for all using (exists (select 1 from oficinas o where o.id = mecanicos.oficina_id and o.owner_id = auth.uid()))
+  with check (exists (select 1 from oficinas o where o.id = mecanicos.oficina_id and o.owner_id = auth.uid()));
+create policy "public can read mecanicos" on mecanicos
+  for select using (true);
+
+create policy "owner manages servicos" on servicos
+  for all using (exists (select 1 from oficinas o where o.id = servicos.oficina_id and o.owner_id = auth.uid()))
+  with check (exists (select 1 from oficinas o where o.id = servicos.oficina_id and o.owner_id = auth.uid()));
+create policy "public can read servicos" on servicos
+  for select using (true);
+
+create policy "owner manages ordens" on ordens_servico
+  for all using (exists (select 1 from oficinas o where o.id = ordens_servico.oficina_id and o.owner_id = auth.uid()))
+  with check (exists (select 1 from oficinas o where o.id = ordens_servico.oficina_id and o.owner_id = auth.uid()));
+create policy "public can create ordem" on ordens_servico
+  for insert with check (status = 'recebido');
+
+create policy "public can read patrocinadores ativos" on patrocinadores
+  for select using (ativo = true);
