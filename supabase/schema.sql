@@ -190,3 +190,18 @@ alter table oficinas add column if not exists trial_expires_at timestamptz;
 update oficinas set trial_expires_at = coalesce(trial_expires_at, created_at + interval '30 days');
 alter table oficinas alter column trial_expires_at set default (now() + interval '30 days');
 alter table oficinas alter column trial_expires_at set not null;
+
+-- ---------- MIGRAÇÃO: conta do Mercado Pago de cada assinante (recebe direto do cliente final dele) ----------
+alter table oficinas add column if not exists mp_connected boolean not null default false;
+
+create table if not exists mp_accounts (
+  id uuid primary key default gen_random_uuid(),
+  oficina_id uuid not null unique references oficinas(id) on delete cascade,
+  mp_user_id text,
+  access_token text not null,
+  refresh_token text,
+  public_key text,
+  connected_at timestamptz default now()
+);
+alter table mp_accounts enable row level security;
+-- De propósito, nenhuma policy é criada aqui: só o backend (chave de serviço) acessa essa tabela.

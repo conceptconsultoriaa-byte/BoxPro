@@ -37,6 +37,13 @@ async function boot(){
   applyBrand();
   await renderSponsorBanner();
   refreshAll();
+
+  const mpParam = new URLSearchParams(window.location.search).get("mp");
+  if(mpParam){
+    if(mpParam === "conectado") alert("Mercado Pago conectado com sucesso! Os pagamentos dos seus clientes já caem direto na sua conta.");
+    else if(mpParam === "erro") alert("Não foi possível conectar o Mercado Pago. Tente novamente.");
+    window.history.replaceState({}, "", window.location.pathname);
+  }
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async ()=>{
@@ -130,6 +137,18 @@ function applyBrand(){
   if(OFICINA.logo_url){ logoEl.src = OFICINA.logo_url; logoEl.classList.remove("hidden"); }
   else { logoEl.classList.add("hidden"); }
   document.body.classList.toggle("fundo-carbono", claro);
+}
+function renderMpStatus(){
+  const statusEl = document.getElementById("mpStatusText");
+  const btn = document.getElementById("mpConectarBtn");
+  if(OFICINA.mp_connected){
+    statusEl.textContent = "✅ Conectado — os pagamentos dos seus clientes caem direto na sua conta.";
+    btn.textContent = "Reconectar";
+  } else {
+    statusEl.textContent = "⚠️ Não conectado — conecte para poder cobrar seus clientes.";
+    btn.textContent = "Conectar Mercado Pago";
+  }
+  btn.href = `${BACKEND_URL}/api/mp/conectar?produto=boxpro&id=${OFICINA.id}`;
 }
 function contrastInk(hex){
   const num = parseInt(hex.slice(1),16);
@@ -399,9 +418,10 @@ async function gerarLinkPagamento(ordem, valor){
     const resp = await fetch(`${BACKEND_URL}/api/pagamento/criar-link`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ descricao: `${OFICINA.name} — ${ordem.veiculo_modelo || ordem.veiculo_tipo}`, valor, agendamentoId: ordem.id })
+      body: JSON.stringify({ descricao: `${OFICINA.name} — ${ordem.veiculo_modelo || ordem.veiculo_tipo}`, valor, agendamentoId: ordem.id, produto: "boxpro", ownerId: OFICINA.id })
     });
     const data = await resp.json();
+    if(data.error === "mp_nao_conectado"){ alert("Conecte sua conta do Mercado Pago em Configurações antes de cobrar seus clientes."); return; }
     if(!data.link){ alert("Erro ao gerar link de pagamento."); return; }
     const msg = `Olá ${ordem.cliente_nome}! Segue o link de pagamento do seu veículo (${ordem.veiculo_modelo || ordem.veiculo_tipo}) na ${OFICINA.name}, valor ${brl(valor)}: ${data.link}`;
     window.open(`https://wa.me/55${ordem.cliente_telefone}?text=${encodeURIComponent(msg)}`, "_blank");
@@ -441,6 +461,7 @@ function renderDashboard(){
 
 /* ---------------- REFRESH ALL ---------------- */
 function refreshAll(){
+  renderMpStatus();
   renderMecList();
   renderServList();
   fillOsSelects();
