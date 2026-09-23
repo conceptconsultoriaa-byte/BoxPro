@@ -134,6 +134,57 @@ create policy "dono atualiza logo da propria oficina" on storage.objects
 create policy "qualquer um pode ver os logos" on storage.objects
   for select using (bucket_id = 'logos');
 
+-- ---------- APROVAÇÃO DE ORÇAMENTO PELO CLIENTE (link público, sem expor a tabela toda) ----------
+-- O cliente recebe um link (aprovar.html?id=<ordem_id>) e aprova/recusa sem precisar ligar.
+-- Funções "security definer" expõem só o necessário, sem abrir SELECT/UPDATE público na tabela.
+
+create or replace function public.get_orcamento_publico(p_id uuid)
+returns table(
+  cliente_nome text,
+  veiculo_tipo text,
+  veiculo_modelo text,
+  veiculo_placa text,
+  valor_orcamento numeric,
+  status text,
+  oficina_nome text,
+  oficina_cor text,
+  oficina_logo text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select os.cliente_nome, os.veiculo_tipo, os.veiculo_modelo, os.veiculo_placa, os.valor_orcamento, os.status,
+         o.name, o.brand_color, o.logo_url
+  from ordens_servico os
+  join oficinas o on o.id = os.oficina_id
+  where os.id = p_id;
+$$;
+
+grant execute on function public.get_orcamento_publico(uuid) to anon, authenticated;
+
+create or replace function public.responder_orcamento(p_id uuid, p_aprovado boolean)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  novo_status text;
+begin
+  novo_status := case when p_aprovado then 'aprovado' else 'cancelado' end;
+  update ordens_servico
+  set status = novo_status
+  where id = p_id and status = 'orcamento';
+  if not found then
+    return null;
+  end if;
+  return novo_status;
+end;
+$$;
+
+grant execute on function public.responder_orcamento(uuid, boolean) to anon, authenticated;
+
 -- ---------- MIGRAÇÃO: prazo do teste grátis (30 dias) ----------
 alter table oficinas add column if not exists trial_expires_at timestamptz;
 update oficinas set trial_expires_at = coalesce(trial_expires_at, created_at + interval '30 days');

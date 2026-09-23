@@ -49,14 +49,14 @@ a{color:inherit;}
 
 /* ---------- FUNDO CARBONO (opcional, escolhido pelo assinante) ---------- */
 body.fundo-carbono{
-  background-color:#101010;
-  background-image:
-    linear-gradient(27deg, #1c1c1c 5px, transparent 5px) 0 5px,
-    linear-gradient(207deg, #1c1c1c 5px, transparent 5px) 10px 0,
-    linear-gradient(27deg, #232323 5px, transparent 5px) 0 10px,
-    linear-gradient(207deg, #232323 5px, transparent 5px) 10px 5px,
-    linear-gradient(90deg, #1a1a1a 10px, transparent 10px),
-    linear-gradient(#161616 25%, #1f1f1f 25%, #1f1f1f 50%, #161616 50%, #161616 75%, #1f1f1f 75%, #1f1f1f 100%);
+  background:
+    linear-gradient(27deg, #1e1e1e 5px, transparent 5px) 0 5px,
+    linear-gradient(207deg, #1e1e1e 5px, transparent 5px) 10px 0,
+    linear-gradient(27deg, #2e2e2e 5px, transparent 5px) 0 10px,
+    linear-gradient(207deg, #2e2e2e 5px, transparent 5px) 10px 5px,
+    linear-gradient(90deg, #0d0d0d 10px, transparent 10px),
+    linear-gradient(#333333 25%, #191919 25%, #191919 50%, #333333 50%, #333333 75%, #191919 75%, #191919 100%);
+  background-color:#141414;
   background-repeat:repeat;
   background-size:20px 20px;
 }

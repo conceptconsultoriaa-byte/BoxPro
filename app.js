@@ -342,6 +342,14 @@ function renderKanban(){
         orcBtn.addEventListener("click", async (ev)=>{ ev.stopPropagation(); await definirValor(o); });
         moveRow.appendChild(orcBtn);
       }
+      if(status === "orcamento" && o.valor_orcamento){
+        const aprovBtn = document.createElement("a");
+        aprovBtn.className = "btn-whats";
+        aprovBtn.textContent = "📩 Enviar Orçamento";
+        aprovBtn.href = "#";
+        aprovBtn.addEventListener("click", async (ev)=>{ ev.preventDefault(); ev.stopPropagation(); await enviarOrcamento(o); });
+        moveRow.appendChild(aprovBtn);
+      }
       if(["aprovado","em_servico","pronto"].includes(status) && valor){
         const linkBtn = document.createElement("a");
         linkBtn.className = "btn-whats";
@@ -375,6 +383,13 @@ async function definirValor(ordem){
   if(isNaN(num)) { alert("Valor inválido."); return; }
   await supabaseClient.from("ordens_servico").update({ valor_orcamento: num }).eq("id", ordem.id);
   await loadAll(); refreshAll();
+}
+
+async function enviarOrcamento(ordem){
+  const base = window.location.href.replace(/index\.html.*$/, "").replace(/\/?$/, "/");
+  const link = `${base}aprovar.html?id=${ordem.id}`;
+  const msg = `Olá ${ordem.cliente_nome}! Segue o orçamento do seu veículo (${ordem.veiculo_modelo || ordem.veiculo_tipo}) na ${OFICINA.name}: ${brl(ordem.valor_orcamento)}. Aprove ou recuse aqui: ${link}`;
+  window.open(`https://wa.me/55${ordem.cliente_telefone}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
 async function gerarLinkPagamento(ordem, valor){
