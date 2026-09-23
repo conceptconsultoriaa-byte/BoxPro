@@ -323,7 +323,7 @@ function renderKanban(){
       card.innerHTML = `
         <div class="plate">${o.veiculo_placa || o.veiculo_modelo || "Sem identificação"}</div>
         <div class="client">${o.cliente_nome} · ${formatDateBR(o.data)}</div>
-        ${valor ? `<div class="value">${brl(valor)}</div>` : ""}
+        ${valor ? `<div class="value">${brl(valor)}${o.pago ? ` <span class="status-badge status-pago">✅ Pago</span>` : ""}</div>` : ""}
         <div class="move-row"></div>
       `;
       const moveRow = card.querySelector(".move-row");
