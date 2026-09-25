@@ -85,16 +85,20 @@
     <section id="tab-mecanicos" class="tab-panel">
       <h1>Mecânicos</h1>
       <form id="mecForm" class="form-inline">
+        <span id="mecFormTitle" class="hint" style="flex-basis:100%; margin:0; display:none; font-weight:800; text-transform:uppercase; font-size:0.78rem; color:var(--lime);"></span>
         <input type="text" id="mecNome" placeholder="Nome do mecânico" required>
         <input type="text" id="mecEspecialidade" placeholder="Especialidade (ex: Motor, Elétrica)">
-        <button type="submit" class="btn-primary">Adicionar</button>
+        <button type="submit" class="btn-primary" id="mecFormSubmitBtn">Adicionar</button>
+        <button type="button" class="btn-secondary" id="mecFormCancelBtn" style="display:none;">Cancelar edição</button>
       </form>
       <h2>Serviços oferecidos</h2>
       <form id="servForm" class="form-inline">
+        <span id="servFormTitle" class="hint" style="flex-basis:100%; margin:0; display:none; font-weight:800; text-transform:uppercase; font-size:0.78rem; color:var(--lime);"></span>
         <input type="text" id="servNome" placeholder="Nome do serviço" required>
         <input type="number" id="servPreco" placeholder="Preço base (R$)" min="0" step="0.01" required>
         <input type="number" id="servDuracao" placeholder="Duração (min)" min="15" step="15" value="60" required>
-        <button type="submit" class="btn-primary">Adicionar serviço</button>
+        <button type="submit" class="btn-primary" id="servFormSubmitBtn">Adicionar serviço</button>
+        <button type="button" class="btn-secondary" id="servFormCancelBtn" style="display:none;">Cancelar edição</button>
       </form>
       <div id="mecList" class="list"></div>
       <div id="servList" class="list"></div>

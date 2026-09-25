@@ -231,21 +231,49 @@ cfgForm.addEventListener("submit", async e=>{
 });
 
 /* ---------------- MECÂNICOS ---------------- */
+let editingMecId = null;
 document.getElementById("mecForm").addEventListener("submit", async e=>{
   e.preventDefault();
-  const limite = planoAtual().mecanicos;
-  if(MECANICOS.length >= limite){
-    alert(`Seu plano atual permite até ${limite} mecânicos. Para cadastrar mais, faça upgrade em Configurações → Assinatura.`);
-    return;
+  if(!editingMecId){
+    const limite = planoAtual().mecanicos;
+    if(MECANICOS.length >= limite){
+      alert(`Seu plano atual permite até ${limite} mecânicos. Para cadastrar mais, faça upgrade em Configurações → Assinatura.`);
+      return;
+    }
   }
   const nome = document.getElementById("mecNome").value.trim();
   const especialidade = document.getElementById("mecEspecialidade").value.trim();
   if(!nome) return;
-  const { error } = await supabaseClient.from("mecanicos").insert({ oficina_id: OFICINA.id, nome, especialidade });
+  let error;
+  if(editingMecId){
+    ({ error } = await supabaseClient.from("mecanicos").update({ nome, especialidade }).eq("id", editingMecId));
+  } else {
+    ({ error } = await supabaseClient.from("mecanicos").insert({ oficina_id: OFICINA.id, nome, especialidade }));
+  }
   if(error){ alert("Erro: " + error.message); return; }
-  e.target.reset();
+  cancelarEdicaoMec();
   await loadAll(); refreshAll();
 });
+function editarMecanico(m){
+  editingMecId = m.id;
+  document.getElementById("mecNome").value = m.nome || "";
+  document.getElementById("mecEspecialidade").value = m.especialidade || "";
+  const titulo = document.getElementById("mecFormTitle");
+  titulo.textContent = "Editando: " + m.nome;
+  titulo.style.display = "block";
+  document.getElementById("mecFormSubmitBtn").textContent = "Salvar alterações";
+  document.getElementById("mecFormCancelBtn").style.display = "inline-block";
+  document.getElementById("mecForm").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("mecNome").focus();
+}
+function cancelarEdicaoMec(){
+  editingMecId = null;
+  document.getElementById("mecForm").reset();
+  document.getElementById("mecFormTitle").style.display = "none";
+  document.getElementById("mecFormSubmitBtn").textContent = "Adicionar";
+  document.getElementById("mecFormCancelBtn").style.display = "none";
+}
+document.getElementById("mecFormCancelBtn").addEventListener("click", cancelarEdicaoMec);
 
 function renderMecList(){
   const el = document.getElementById("mecList");
@@ -254,8 +282,13 @@ function renderMecList(){
   MECANICOS.forEach(m=>{
     const div = document.createElement("div");
     div.className = "list-item";
-    div.innerHTML = `<span><strong>${m.nome}</strong>${m.especialidade ? " — " + m.especialidade : ""}</span><button class="btn-danger">Remover</button>`;
-    div.querySelector("button").addEventListener("click", async ()=>{
+    div.innerHTML = `<span><strong>${m.nome}</strong>${m.especialidade ? " — " + m.especialidade : ""}</span>
+      <span style="display:flex; gap:8px;">
+        <button class="btn-secondary btn-editar">Editar</button>
+        <button class="btn-danger">Remover</button>
+      </span>`;
+    div.querySelector(".btn-editar").addEventListener("click", ()=> editarMecanico(m));
+    div.querySelector(".btn-danger").addEventListener("click", async ()=>{
       if(!confirm(`Remover ${m.nome}?`)) return;
       await supabaseClient.from("mecanicos").delete().eq("id", m.id);
       await loadAll(); refreshAll();
@@ -265,18 +298,45 @@ function renderMecList(){
 }
 
 /* ---------------- SERVIÇOS ---------------- */
+let editingServId = null;
 document.getElementById("servForm").addEventListener("submit", async e=>{
   e.preventDefault();
   const nome = document.getElementById("servNome").value.trim();
   const preco_base = parseFloat(document.getElementById("servPreco").value);
   const duracao_min = parseInt(document.getElementById("servDuracao").value,10);
   if(!nome || isNaN(preco_base) || isNaN(duracao_min)) return;
-  const { error } = await supabaseClient.from("servicos").insert({ oficina_id: OFICINA.id, nome, preco_base, duracao_min });
+  let error;
+  if(editingServId){
+    ({ error } = await supabaseClient.from("servicos").update({ nome, preco_base, duracao_min }).eq("id", editingServId));
+  } else {
+    ({ error } = await supabaseClient.from("servicos").insert({ oficina_id: OFICINA.id, nome, preco_base, duracao_min }));
+  }
   if(error){ alert("Erro: " + error.message); return; }
-  e.target.reset();
-  document.getElementById("servDuracao").value = 60;
+  cancelarEdicaoServ();
   await loadAll(); refreshAll();
 });
+function editarServico(s){
+  editingServId = s.id;
+  document.getElementById("servNome").value = s.nome || "";
+  document.getElementById("servPreco").value = s.preco_base || "";
+  document.getElementById("servDuracao").value = s.duracao_min || 60;
+  const titulo = document.getElementById("servFormTitle");
+  titulo.textContent = "Editando: " + s.nome;
+  titulo.style.display = "block";
+  document.getElementById("servFormSubmitBtn").textContent = "Salvar alterações";
+  document.getElementById("servFormCancelBtn").style.display = "inline-block";
+  document.getElementById("servForm").scrollIntoView({ behavior: "smooth", block: "start" });
+  document.getElementById("servNome").focus();
+}
+function cancelarEdicaoServ(){
+  editingServId = null;
+  document.getElementById("servForm").reset();
+  document.getElementById("servDuracao").value = 60;
+  document.getElementById("servFormTitle").style.display = "none";
+  document.getElementById("servFormSubmitBtn").textContent = "Adicionar serviço";
+  document.getElementById("servFormCancelBtn").style.display = "none";
+}
+document.getElementById("servFormCancelBtn").addEventListener("click", cancelarEdicaoServ);
 
 function renderServList(){
   const el = document.getElementById("servList");
@@ -284,8 +344,13 @@ function renderServList(){
   SERVICOS.forEach(s=>{
     const div = document.createElement("div");
     div.className = "list-item";
-    div.innerHTML = `<span><strong>${s.nome}</strong> — ${brl(s.preco_base)} · ${s.duracao_min} min</span><button class="btn-danger">Remover</button>`;
-    div.querySelector("button").addEventListener("click", async ()=>{
+    div.innerHTML = `<span><strong>${s.nome}</strong> — ${brl(s.preco_base)} · ${s.duracao_min} min</span>
+      <span style="display:flex; gap:8px;">
+        <button class="btn-secondary btn-editar">Editar</button>
+        <button class="btn-danger">Remover</button>
+      </span>`;
+    div.querySelector(".btn-editar").addEventListener("click", ()=> editarServico(s));
+    div.querySelector(".btn-danger").addEventListener("click", async ()=>{
       await supabaseClient.from("servicos").delete().eq("id", s.id);
       await loadAll(); refreshAll();
     });
